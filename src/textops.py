@@ -1,14 +1,9 @@
-"""Text Cleanup — Starter
+# src/textops.py
 
-You are processing a short list of words from a form.
-Implement without mutating inputs.
-"""
-from typing import List
 from collections import Counter
 
-
-def unique_words_preserve_order(words: List[str]) -> List[str]:
-    """Return first occurrences only (case-sensitive)."""
+def unique_words_preserve_order(words):
+    """Return unique words while preserving their first occurrence order."""
     seen = set()
     result = []
     for w in words:
@@ -18,22 +13,32 @@ def unique_words_preserve_order(words: List[str]) -> List[str]:
     return result
 
 
-def top_k_frequent_first_tie(words: List[str], k: int) -> List[str]:
-    """Return up to k words ordered by frequency (high to low).
-
-    For ties, earlier first-appearance wins.
-    If k <= 0, raise ValueError.
+def top_k_frequent_first_tie(words, k):
+    """
+    Return top-k frequent words.
+    If counts tie, earlier first appearance wins.
     """
     if k <= 0:
         raise ValueError("k must be positive")
 
-    count = Counter(words)
-    first_index = {word: i for i, word in enumerate(words)}
-    sorted_words = sorted(count.keys(), key=lambda w: (-count[w], first_index[w]))
+    counts = Counter(words)
+
+    # Record first index of each word
+    first_index = {}
+    for i, w in enumerate(words):
+        if w not in first_index:
+            first_index[w] = i
+
+    # Sort by frequency (desc), then first appearance (asc)
+    sorted_words = sorted(
+        counts.keys(),
+        key=lambda w: (-counts[w], first_index[w])
+    )
+
     return sorted_words[:k]
 
 
-def redact_words(words: List[str], redacted: List[str]) -> List[str]:
-    """Return a new list with redacted words replaced by '***'."""
-    redacted_set = set(redacted)
-    return ["***" if w in redacted_set else w for w in words]
+def redact_words(words, banned):
+    """Replace banned words with *** in the list of words."""
+    banned_set = set(banned)
+    return ["***" if w in banned_set else w for w in words]
